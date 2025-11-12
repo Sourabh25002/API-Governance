@@ -2,6 +2,7 @@
 
 const path = require('path');
 const { runAllRules } = require('../services/governanceEngine');
+const swaggerSpec = require('../services/swaggerSpec'); // adjust path accordingly
 
 // Adjust path to your OpenAPI JSON spec file
 const swaggerSpec = require(path.resolve(__dirname, '../path/to/swaggerSpec.json'));

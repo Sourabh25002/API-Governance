@@ -1,21 +1,16 @@
-// backend/scripts/runGovernanceCheck.js
-
 const path = require('path');
 const { runAllRules } = require('../services/governanceEngine');
-const swaggerSpec = require('../path/to/swaggerSpec.json');
 
-
-// Adjust path to your OpenAPI JSON spec file
+// Import your OpenAPI spec only once here
 const swaggerSpec = require(path.resolve(__dirname, '../path/to/swaggerSpec.json'));
 
-// Run governance rules on the spec
 const result = runAllRules(swaggerSpec);
 
 console.log('Governance Score:', result.score);
 
 if (result.violations.length > 0) {
-  console.error('Violations found:', result.violations);
-  process.exit(1); // Exit with failure if violations exist
+  console.error('Violations:', result.violations);
+  process.exit(1); // Fail if violations found
 }
 
-process.exit(0); // Success if no violations
+process.exit(0);

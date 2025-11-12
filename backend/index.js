@@ -18,6 +18,15 @@ app.get('/governance/check', (req, res) => {
   res.json(report);
 });
 
+// Run governance check at startup
+const governanceResult = runAllRules(swaggerSpec);
+console.log("Governance Score:", governanceResult.score);
+if (governanceResult.violations.length > 0) {
+  console.error("Governance Violations:", governanceResult.violations);
+} else {
+  console.log("No governance violations found.");
+}
+
 const options = {
   definition: {
     openapi: '3.0.0',

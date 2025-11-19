@@ -6,32 +6,37 @@ const router = express.Router();
  * /users:
  *   get:
  *     summary: Retrieve a list of users
+ *     security:
+ *       - ApiKeyAuth: []
  *     responses:
  *       200:
  *         description: List of user names
  */
-router.get('/users', (req, res) => {
+router.get('/api/users', (req, res) => {
   res.json(['user1', 'user2', 'user3']);
 });
 
+
 /**
  * @swagger
- * /products:
+ * /api/products:
  *   get:
  *     summary: Retrieve a list of products
  *     responses:
  *       200:
  *         description: List of products
  */
-router.get('/products', (req, res) => {
+router.get('/api/products', (req, res) => {
   res.json(['product1', 'product2', 'product3']);
 });
 
 /**
  * @swagger
- * /orders:
+ * /api/orders:
  *   post:
  *     summary: Create a new order
+ *     security:
+ *       - ApiKeyAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -47,20 +52,18 @@ router.get('/products', (req, res) => {
  *       201:
  *         description: Order created successfully
  */
-router.post('/orders', (req, res) => {
+router.post('/api/orders', (req, res) => {
   res.status(201).json({ message: 'Order created' });
 });
 
 /**
  * @swagger
- * /status:
+ * /api/status:
  *   get:
  *     summary: Get service status
- *     responses:
- *       200:
- *         description: Service status
+ *     # Removed responses to simulate an endpoint missing response for governance failures
  */
-router.get('/status', (req, res) => {
+router.get('/api/status', (req, res) => {
   res.json({ status: 'Server is running' });
 });
 

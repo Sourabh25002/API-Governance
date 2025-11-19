@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const fs = require('fs');
+const path = require('path');
 const apiRoutes = require('./routes/api');
 const {runAllRules} = require('./services/governanceEngine');
 
@@ -12,20 +14,6 @@ const PORT = process.env.PORT || 8000;
 app.use(cors({
   origin: 'http://localhost:3000',  // Allow your frontend origin
 }));
-
-app.get('/governance/check', (req, res) => {
-  const report = runAllRules(swaggerSpec);
-  res.json(report);
-});
-
-// Run governance check at startup
-const governanceResult = runAllRules(swaggerSpec);
-console.log("Governance Score:", governanceResult.score);
-if (governanceResult.violations.length > 0) {
-  console.error("Governance Violations:", governanceResult.violations);
-} else {
-  console.log("No governance violations found.");
-}
 
 const options = {
   definition: {
@@ -49,6 +37,30 @@ const options = {
 };
 
 const swaggerSpec = swaggerJSDoc(options);
+
+const swaggerSpecPath = path.join(__dirname, 'Adobe Experience Manager (AEM) API-swagger.json');
+const loadedSpec = JSON.parse(fs.readFileSync(swaggerSpecPath, 'utf8'));
+const Result = runAllRules(loadedSpec);
+console.log('Governance Score:', Result.score);
+console.log('Violations:', Result.violations);
+
+app.get('/governance/check', (req, res) => {
+  const report = runAllRules(swaggerSpec);
+  res.json(report);
+});
+
+// Run governance check at startup
+const governanceResult = runAllRules(swaggerSpec);
+console.log("Governance Score:", governanceResult.score);
+if (governanceResult.violations.length > 0) {
+  console.error("Governance Violations:", governanceResult.violations);
+} else {
+  console.log("No governance violations found.");
+}
+
+
+
+
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

@@ -31,7 +31,7 @@ jobs:
           cd backend
 
           # Run governance on specific files from public folder
-          node runGovernanceChecks.js
+          node services/runGovernanceChecks.js
 
           # Extract overall stats (you can modify script to output these)
           TOTAL_FILES=$(jq -r '.totalFiles' governance-multi-report.json || echo "0")

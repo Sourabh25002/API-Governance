@@ -10,105 +10,105 @@ jobs:
   governance-check:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
 
-    - name: Install backend dependencies
-      run: |
-        cd backend
-        npm ci
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
 
-    - name: Run Governance Check
-      id: governance
-      run: |
-        cd backend
-        
-        # Start server in background
-        npm start &
-        SERVER_PID=$!
-        
-        # Wait for governance endpoint to be ready (30s timeout)
-        npx wait-on http://localhost:8000/governance/check --timeout 30000
-        
-        # Call governance endpoint and save report
-        curl -s http://localhost:8000/governance/check > governance-report.json
-        
-        # Extract compliance score
-        COMPLIANCE_SCORE=$(jq -r '.score' governance-report.json)
-        TOTAL_VIOLATIONS=$(jq '.violations | length' governance-report.json)
-        
-        echo "📊 Compliance Score: ${COMPLIANCE_SCORE}%"
-        echo "🔍 Total Violations: ${TOTAL_VIOLATIONS}"
-        echo "compliance_score=${COMPLIANCE_SCORE}" >> $GITHUB_OUTPUT
-        echo "violations=${TOTAL_VIOLATIONS}" >> $GITHUB_OUTPUT
-        
-        # Display first 10 violations for quick review
-        echo "❌ Top Violations:"
-        jq -r '.violations[:10] | "\(.path) | \(.method || "N/A") | \(.message)"' governance-report.json
-        
-        # Fail build if compliance < 80% (adjust threshold as needed)
-        if (( $(echo "${COMPLIANCE_SCORE} < 80" | bc -l) )); then
-          echo "❌ Compliance score ${COMPLIANCE_SCORE}% below threshold (80%)"
-          echo "💡 Full report:"
-          cat governance-report.json
-          exit 1
-        fi
-        
-        echo "✅ Governance check PASSED! Score: ${COMPLIANCE_SCORE}%"
-        kill $SERVER_PID
-      shell: bash
+      - name: Run Governance Check
+        id: governance
+        run: |
+          cd backend
 
-    - name: Upload Governance Report
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: governance-report-${{ github.sha }}
-        path: backend/governance-report.json
-        retention-days: 30
+          # Start server in background
+          npm start &
+          SERVER_PID=$!
 
-    - name: Comment PR with Results
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const fs = require('fs');
-          try {
-            const report = JSON.parse(fs.readFileSync('./backend/governance-report.json'));
-            const score = report.score;
-            const violations = report.violations.length;
+          # Wait for governance endpoint to be ready (30s timeout)
+          npx wait-on http://localhost:8000/governance/check --timeout 30000
 
-            const status = score >= 90 ? '✅ Excellent' :
-                           score >= 80 ? '✅ Good' : '⚠️ Needs Attention';
+          # Call governance endpoint and save report
+          curl -s http://localhost:8000/governance/check > governance-report.json
 
-            const body = `
-## 🛡️ API Governance Check Results
+          # Extract compliance score
+          COMPLIANCE_SCORE=$(jq -r '.score' governance-report.json)
+          TOTAL_VIOLATIONS=$(jq '.violations | length' governance-report.json)
 
-\*\*Compliance Score\*\*: ${score}%
-\*\*Total Violations\*\*: ${violations}
+          echo "📊 Compliance Score: ${COMPLIANCE_SCORE}%"
+          echo "🔍 Total Violations: ${TOTAL_VIOLATIONS}"
+          echo "compliance_score=${COMPLIANCE_SCORE}" >> $GITHUB_OUTPUT
+          echo "violations=${TOTAL_VIOLATIONS}" >> $GITHUB_OUTPUT
 
-${status}
+          # Display first 10 violations for quick review
+          echo "❌ Top Violations:"
+          jq -r '.violations[:10] | "\(.path) | \(.method || "N/A") | \(.message)"' governance-report.json
 
-${score >= 80 ? '🚀 Ready for merge!' : '🔧 Fix violations before merging'}
+          # Fail build if compliance < 80% (adjust threshold as needed)
+          if (( $(echo "${COMPLIANCE_SCORE} < 80" | bc -l) )); then
+            echo "❌ Compliance score ${COMPLIANCE_SCORE}% below threshold (80%)"
+            echo "💡 Full report:"
+            cat governance-report.json
+            exit 1
+          fi
 
-*Full report: Download artifact from CI*
-            `;
+          echo "✅ Governance check PASSED! Score: ${COMPLIANCE_SCORE}%"
+          kill $SERVER_PID
+        shell: bash
 
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
-            });
+      - name: Upload Governance Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: governance-report-${{ github.sha }}
+          path: backend/governance-report.json
+          retention-days: 30
 
-          } catch (error) {
-            console.log('Could not comment on PR', error);
-          }
+      - name: Comment PR with Results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            try {
+              const report = JSON.parse(fs.readFileSync('./backend/governance-report.json'));
+              const score = report.score;
+              const violations = report.violations.length;
+
+              const status = score >= 90 ? '✅ Excellent' :
+                             score >= 80 ? '✅ Good' : '⚠️ Needs Attention';
+
+              const body = `
+                ## 🛡️ API Governance Check Results
+
+                **Compliance Score**: ${score}%
+                **Total Violations**: ${violations}
+
+                ${status}
+
+                ${score >= 80 ? '🚀 Ready for merge!' : '🔧 Fix violations before merging'}
+
+                *Full report: Download artifact from CI*
+              `;
+
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+
+            } catch (error) {
+              console.log('Could not comment on PR', error);
+            }

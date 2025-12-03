@@ -52,7 +52,10 @@ jobs:
       - name: Print Top 10 Violations
         run: |
           echo "❌ Top Violations:"
-          jq -r '.violations[:10] | .[] | "\(.path) | \(.method // \"N/A\") | \(.message)"' results.json
+          jq -r "$(cat << 'EOF'
+          .violations[:10] | .[] | "\(.path) | \(.method // "N/A") | \(.message)"
+          EOF
+          )" governance-report.json
 
           # Fail build if compliance < 80% (adjust threshold as needed)
           if (( $(echo "${COMPLIANCE_SCORE} < 80" | bc -l) )); then

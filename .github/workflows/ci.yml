@@ -49,7 +49,8 @@ jobs:
           echo "compliance_score=${COMPLIANCE_SCORE}" >> $GITHUB_OUTPUT
           echo "violations=${TOTAL_VIOLATIONS}" >> $GITHUB_OUTPUT
 
-          # Display first 10 violations for quick review
+      - name: Print Top 10 Violations
+        run: |
           echo "❌ Top Violations:"
           jq -r '.violations[:10] | "\(.path) | \(.method || "N/A") | \(.message)"' governance-report.json
 

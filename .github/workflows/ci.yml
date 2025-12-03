@@ -92,8 +92,8 @@ jobs:
             const body = `
 ## 🛡️ API Governance Check Results
 
-**Compliance Score**: ${score}%
-**Total Violations**: ${violations}
+\*\*Compliance Score\*\*: ${score}%
+\*\*Total Violations\*\*: ${violations}
 
 ${status}
 

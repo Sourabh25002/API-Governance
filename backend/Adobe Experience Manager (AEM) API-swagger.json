@@ -18,9 +18,7 @@
     "description": "Swagger AEM is an OpenAPI specification for Adobe Experience Manager (AEM) API",
     "title": "Adobe Experience Manager (AEM) API",
     "version": "3.7.1-pre.0",
-    "x-apisguru-categories": [
-      "marketing"
-    ],
+    "x-apisguru-categories": ["marketing"],
     "x-logo": {
       "url": "https://api.apis.guru/v2/cache/logo/https_twitter.com_Adobe_profile_image.jpeg"
     },
@@ -67,9 +65,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "cq"
-        ]
+        "tags": ["cq"]
       }
     },
     "/apps/system/config/com.adobe.granite.auth.saml.SamlAuthenticationHandler.config": {
@@ -478,9 +474,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/apps/system/config/com.shinesolutions.aem.passwordreset.Activator": {
@@ -513,9 +507,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "custom"
-        ]
+        "tags": ["custom"]
       }
     },
     "/apps/system/config/com.shinesolutions.healthcheck.hc.impl.ActiveBundleHealthCheck": {
@@ -548,9 +540,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "custom"
-        ]
+        "tags": ["custom"]
       }
     },
     "/apps/system/config/org.apache.felix.http": {
@@ -723,9 +713,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/apps/system/config/org.apache.http.proxyconfigurator.config": {
@@ -838,9 +826,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/apps/system/config/org.apache.sling.jcr.davex.impl.servlets.SlingDavExServlet": {
@@ -885,9 +871,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/apps/system/config/org.apache.sling.security.impl.ReferrerFilter": {
@@ -964,9 +948,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/apps/system/config/org.apache.sling.servlets.get.DefaultGetServlet": {
@@ -1043,9 +1025,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/apps/system/config/{configNodeName}": {
@@ -1066,9 +1046,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/bin/querybuilder.json": {
@@ -1120,9 +1098,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       },
       "post": {
         "operationId": "postQuery",
@@ -1172,9 +1148,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/crx/explorer/ui/setpassword.jsp": {
@@ -1218,9 +1192,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "crx"
-        ]
+        "tags": ["crx"]
       }
     },
     "/crx/packmgr/installstatus.jsp": {
@@ -1248,9 +1220,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "crx"
-        ]
+        "tags": ["crx"]
       }
     },
     "/crx/packmgr/service.jsp": {
@@ -1278,9 +1248,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "crx"
-        ]
+        "tags": ["crx"]
       }
     },
     "/crx/packmgr/service/.json/{path}": {
@@ -1379,9 +1347,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "crx"
-        ]
+        "tags": ["crx"]
       }
     },
     "/crx/packmgr/service/script.html": {
@@ -1409,9 +1375,7 @@
             "description": "Package Manager Servlet is active"
           }
         },
-        "tags": [
-          "crx"
-        ]
+        "tags": ["crx"]
       }
     },
     "/crx/packmgr/update.jsp": {
@@ -1479,9 +1443,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "crx"
-        ]
+        "tags": ["crx"]
       }
     },
     "/crx/server/crx.default/jcr:root/.1.json": {
@@ -1509,9 +1471,7 @@
             "description": "CRXDE is disabled"
           }
         },
-        "tags": [
-          "crx"
-        ]
+        "tags": ["crx"]
       }
     },
     "/etc/packages/{group}/{name}-{version}.zip": {
@@ -1556,9 +1516,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/etc/packages/{group}/{name}-{version}.zip/jcr:content/vlt:definition/filter.tidy.2.json": {
@@ -1602,9 +1560,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/etc/replication/agents.{runmode}.-1.json": {
@@ -1632,9 +1588,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/etc/replication/agents.{runmode}/{name}": {
@@ -1663,9 +1617,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       },
       "get": {
         "operationId": "getAgent",
@@ -1692,9 +1644,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       },
       "post": {
         "operationId": "postAgent",
@@ -2125,9 +2075,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/etc/truststore": {
@@ -2160,9 +2108,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/etc/truststore/truststore.p12": {
@@ -2181,9 +2127,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/libs/granite/core/content/login.html": {
@@ -2202,9 +2146,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "cq"
-        ]
+        "tags": ["cq"]
       }
     },
     "/libs/granite/security/post/authorizables": {
@@ -2272,9 +2214,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/libs/granite/security/post/sslSetup.html": {
@@ -2361,9 +2301,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "granite"
-        ]
+        "tags": ["granite"]
       }
     },
     "/libs/granite/security/post/truststore": {
@@ -2438,9 +2376,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/libs/granite/security/truststore.json": {
@@ -2468,9 +2404,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/libs/replication/treeactivation.html": {
@@ -2516,9 +2450,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/system/console/bundles/{name}": {
@@ -2547,9 +2479,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "console"
-        ]
+        "tags": ["console"]
       }
     },
     "/system/console/bundles/{name}.json": {
@@ -2587,9 +2517,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "console"
-        ]
+        "tags": ["console"]
       }
     },
     "/system/console/configMgr": {
@@ -2610,9 +2538,7 @@
             "description": "Unexpected error."
           }
         },
-        "tags": [
-          "console"
-        ]
+        "tags": ["console"]
       }
     },
     "/system/console/configMgr/com.adobe.granite.auth.saml.SamlAuthenticationHandler": {
@@ -2909,9 +2835,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "console"
-        ]
+        "tags": ["console"]
       }
     },
     "/system/console/jmx/com.adobe.granite:type=Repository/op/{action}": {
@@ -2932,9 +2856,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "console"
-        ]
+        "tags": ["console"]
       }
     },
     "/system/console/status-productinfo.json": {
@@ -2955,9 +2877,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "console"
-        ]
+        "tags": ["console"]
       }
     },
     "/system/health": {
@@ -2993,9 +2913,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "custom"
-        ]
+        "tags": ["custom"]
       }
     },
     "/{intermediatePath}/{authorizableId}.ks.html": {
@@ -3136,9 +3054,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/{intermediatePath}/{authorizableId}.ks.json": {
@@ -3184,9 +3100,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/{intermediatePath}/{authorizableId}/keystore/store.p12": {
@@ -3223,9 +3137,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/{path}/": {
@@ -3262,9 +3174,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/{path}/{name}": {
@@ -3293,9 +3203,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       },
       "get": {
         "operationId": "getNode",
@@ -3322,9 +3230,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       },
       "post": {
         "operationId": "postNode",
@@ -3382,9 +3288,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     },
     "/{path}/{name}.rw.html": {
@@ -3421,9 +3325,7 @@
             "description": "Default response"
           }
         },
-        "tags": [
-          "sling"
-        ]
+        "tags": ["sling"]
       }
     }
   },

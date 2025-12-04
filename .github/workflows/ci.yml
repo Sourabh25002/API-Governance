@@ -25,7 +25,7 @@ jobs:
           cd backend
           npm ci
 
-            - name: Run Governance Check
+      - name: Run Governance Check
         id: governance
         run: |
           cd backend
@@ -85,7 +85,6 @@ jobs:
           echo "✅ Governance checks PASSED"
 
           kill $SERVER_PID
-
 
       - name: Upload Governance Report
         if: always()

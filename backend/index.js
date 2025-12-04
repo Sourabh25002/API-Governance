@@ -107,6 +107,11 @@ app.get("/governance/check/files", (req, res) => {
     "Amazon CloudDirectory-swagger.json", // 38
     "Amazon CloudFront-swagger.json", // 49
     "AmazonApiGatewayV2-swagger.json", // 72
+    "AmplifyBackend-swagger.json", // 31
+    "Auto Scaling-swagger.json", // 65
+    "AWS App Runner-swagger.json", // 35
+    "AWS Audit Manager.json", // 61
+    // "AWS Audit Manager-swagger.json", // 61
   ];
 
   const results = [];

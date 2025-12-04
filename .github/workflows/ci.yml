@@ -25,22 +25,24 @@ jobs:
           cd backend
           npm ci
 
-      - name: Run Governance Check
+            - name: Run Governance Check
         id: governance
         run: |
           cd backend
 
-          # Start server in background
+          # Start server in background & save PID
           npm start &
           SERVER_PID=$!
+          echo $SERVER_PID > server.pid
 
           # Wait for governance endpoint to be ready (30s timeout)
           npx wait-on http://localhost:8000/governance/check --timeout 30000
 
-          # Call governance endpoint and save report
+          # -------------------------------
+          # 1️⃣ Single-file governance
+          # -------------------------------
           curl -s http://localhost:8000/governance/check > governance-report.json
 
-          # Extract compliance score
           COMPLIANCE_SCORE=$(jq -r '.score' governance-report.json)
           TOTAL_VIOLATIONS=$(jq '.violations | length' governance-report.json)
 
@@ -49,39 +51,41 @@ jobs:
           echo "compliance_score=${COMPLIANCE_SCORE}" >> $GITHUB_OUTPUT
           echo "violations=${TOTAL_VIOLATIONS}" >> $GITHUB_OUTPUT
 
-          # Fail build if compliance < 80% (adjust threshold as needed)
           if (( $(echo "${COMPLIANCE_SCORE} < 80" | bc -l) )); then
-            echo "❌ Compliance score ${COMPLIANCE_SCORE}% below threshold (80%)"
-            echo "💡 Full report:"
+            echo "❌ Compliance below threshold"
             cat governance-report.json
+            kill $SERVER_PID
             exit 1
           fi
 
-          echo "✅ Governance check PASSED! Score: ${COMPLIANCE_SCORE}%"
-          kill $SERVER_PID
-        shell: bash
+          # -------------------------------
+          # 2️⃣ Multi-file governance
+          # -------------------------------
+          curl -s http://localhost:8000/governance/check/files > governance-files-report.json
 
-      - name: Run Governance Check on /governance/check/files
-        id: governance_files
-        run: |
-          curl -s http://localhost:8000/governance/check/files > backend/governance-files-report.json
-          AVG_SCORE=$(jq -r '.avgScore' backend/governance-files-report.json)
-          TOTAL_VIOLATIONS=$(jq -r '.totalViolations' backend/governance-files-report.json)
-          echo "📊 /governance/check/files Avg Score: ${AVG_SCORE}%"
-          echo "🔍 Total Violations: ${TOTAL_VIOLATIONS}"
+          # Extract values safely
+          TOTAL_FILES=$(jq '.results | length' governance-files-report.json)
+          AVG_SCORE=$(jq '[.results[].report.score] | add / length' governance-files-report.json)
+          TOTAL_MULTI_VIOLATIONS=$(jq '[.results[].report.violations | length] | add' governance-files-report.json)
+
+          echo "📁 Files Checked: ${TOTAL_FILES}"
+          echo "📈 Avg Score: ${AVG_SCORE}"
+          echo "❌ Violations: ${TOTAL_MULTI_VIOLATIONS}"
+
           echo "avg_score=${AVG_SCORE}" >> $GITHUB_OUTPUT
-          echo "multi_violations=${TOTAL_VIOLATIONS}" >> $GITHUB_OUTPUT
+          echo "multi_violations=${TOTAL_MULTI_VIOLATIONS}" >> $GITHUB_OUTPUT
+
           if (( $(echo "${AVG_SCORE} < 80" | bc -l) )); then
-            echo "❌ Avg compliance below threshold (80%)"
-            cat backend/governance-files-report.json
-            kill $(cat server.pid)
+            echo "❌ Multi-file compliance ${AVG_SCORE}% below threshold"
+            cat governance-files-report.json
+            kill $SERVER_PID
             exit 1
           fi
 
-      - name: Kill backend server
-        if: always()
-        run: |
-          kill $(cat backend/server.pid)
+          echo "✅ Governance checks PASSED"
+
+          kill $SERVER_PID
+
 
       - name: Upload Governance Report
         if: always()

@@ -99,9 +99,14 @@ const specificFiles = [
 
 app.get("/governance/check/files", (req, res) => {
   const specificFiles = [
-    "Alexa For Business-swagger.json",
-    "Amazon API Gateway-swagger.json",
-    "Amazon AppStream-swagger.json",
+    "Alexa For Business-swagger.json", // 93
+    "Amazon API Gateway-swagger.json", // 120
+    "Amazon AppStream-swagger.json", // 65
+    "Amazon Athena-swagger.json", // 60
+    "Amazon Chime-swagger.json", // 60
+    "Amazon CloudDirectory-swagger.json", // 38
+    "Amazon CloudFront-swagger.json", // 49
+    "AmazonApiGatewayV2-swagger.json", // 72
   ];
 
   const results = [];

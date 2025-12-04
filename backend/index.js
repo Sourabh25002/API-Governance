@@ -111,7 +111,12 @@ app.get("/governance/check/files", (req, res) => {
     "Auto Scaling-swagger.json", // 65
     "AWS App Runner-swagger.json", // 35
     "AWS Audit Manager.json", // 61
-    // "AWS Audit Manager-swagger.json", // 61
+    "AWS Audit Manager-swagger.json", // 61
+    "AWS Backup-swagger.json", // 72
+    "AWS CloudFormation-swagger.json", // 66
+    "AWS CloudTrail-swagger.json", // 34
+    "AWS CodeBuild-swagger.json", // 34
+    "AWS Cost Explorer Service-swagger.json", // 26
   ];
 
   const results = [];

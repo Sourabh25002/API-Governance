@@ -25,37 +25,6 @@ jobs:
           cd backend
           npm ci
 
-      - name: Run Governance Checks on Public Files
-        id: multi-file-governance
-        run: |
-          cd backend
-
-          # Run governance on specific files from public folder
-          node services/runGovernanceChecks.js
-
-          # Extract overall stats (you can modify script to output these)
-          TOTAL_FILES=$(jq -r '.totalFiles' governance-multi-report.json || echo "0")
-          AVG_SCORE=$(jq -r '.avgScore' governance-multi-report.json || echo "0")
-          TOTAL_VIOLATIONS=$(jq -r '.totalViolations' governance-multi-report.json || echo "0")
-
-          echo "📊 Total Files Checked: ${TOTAL_FILES}"
-          echo "📈 Average Compliance Score: ${AVG_SCORE}%"
-          echo "🔍 Total Violations: ${TOTAL_VIOLATIONS}"
-
-          echo "total_files=${TOTAL_FILES}" >> $GITHUB_OUTPUT
-          echo "avg_score=${AVG_SCORE}" >> $GITHUB_OUTPUT
-          echo "multi_violations=${TOTAL_VIOLATIONS}" >> $GITHUB_OUTPUT
-
-          # Fail if average score < 80%
-          if (( $(echo "${AVG_SCORE} < 80" | bc -l) )); then
-            echo "❌ Average compliance ${AVG_SCORE}% below threshold (80%)"
-            cat governance-multi-report.json
-            exit 1
-          fi
-
-          echo "✅ Multi-file governance PASSED! Avg: ${AVG_SCORE}%"
-        shell: bash
-
       - name: Run Governance Check
         id: governance
         run: |
@@ -91,6 +60,28 @@ jobs:
           echo "✅ Governance check PASSED! Score: ${COMPLIANCE_SCORE}%"
           kill $SERVER_PID
         shell: bash
+
+      - name: Run Governance Check on /governance/check/files
+        id: governance_files
+        run: |
+          curl -s http://localhost:8000/governance/check/files > backend/governance-files-report.json
+          AVG_SCORE=$(jq -r '.avgScore' backend/governance-files-report.json)
+          TOTAL_VIOLATIONS=$(jq -r '.totalViolations' backend/governance-files-report.json)
+          echo "📊 /governance/check/files Avg Score: ${AVG_SCORE}%"
+          echo "🔍 Total Violations: ${TOTAL_VIOLATIONS}"
+          echo "avg_score=${AVG_SCORE}" >> $GITHUB_OUTPUT
+          echo "multi_violations=${TOTAL_VIOLATIONS}" >> $GITHUB_OUTPUT
+          if (( $(echo "${AVG_SCORE} < 80" | bc -l) )); then
+            echo "❌ Avg compliance below threshold (80%)"
+            cat backend/governance-files-report.json
+            kill $(cat server.pid)
+            exit 1
+          fi
+
+      - name: Kill backend server
+        if: always()
+        run: |
+          kill $(cat backend/server.pid)
 
       - name: Upload Governance Report
         if: always()

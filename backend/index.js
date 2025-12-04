@@ -79,22 +79,47 @@ const specificFiles = [
   "Amazon AppStream-swagger.json",
 ];
 
-specificFiles.forEach((file) => {
-  const filePath = path.join(specsDir, file);
-  if (!fs.existsSync(filePath)) {
-    console.warn(`File not found: ${file}`);
-    return;
-  }
-  const spec = JSON.parse(fs.readFileSync(filePath, "utf8"));
+// specificFiles.forEach((file) => {
+//   const filePath = path.join(specsDir, file);
+//   if (!fs.existsSync(filePath)) {
+//     console.warn(`File not found: ${file}`);
+//     return;
+//   }
+//   const spec = JSON.parse(fs.readFileSync(filePath, "utf8"));
 
-  const result = runAllRules(spec);
-  console.log(`Governance Score for ${file}:`, result.score);
+//   const result = runAllRules(spec);
+//   console.log(`Governance Score for ${file}:`, result.score);
 
-  if (result.violations.length > 0) {
-    console.error(`Violations for ${file}:`, result.violations);
-  } else {
-    console.log(`No violations found for ${file}.`);
-  }
+//   if (result.violations.length > 0) {
+//     console.error(`Violations for ${file}:`, result.violations);
+//   } else {
+//     console.log(`No violations found for ${file}.`);
+//   }
+// });
+
+app.get("/governance/check/files", (req, res) => {
+  const specificFiles = ["Alexa For Business-swagger.json"];
+
+  const results = [];
+
+  specificFiles.forEach((filename) => {
+    const filePath = path.join(__dirname, "public", filename);
+
+    if (!fs.existsSync(filePath)) {
+      results.push({ filename, error: "File not found" });
+      return;
+    }
+
+    try {
+      const spec = JSON.parse(fs.readFileSync(filePath, "utf8"));
+      const report = runAllRules(spec);
+      results.push({ filename, report });
+    } catch (err) {
+      results.push({ filename, error: err.message });
+    }
+  });
+
+  res.json({ results });
 });
 
 // Endpoint: API Governance check that runs governance engine against swaggerSpec dynamically

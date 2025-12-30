@@ -53,8 +53,7 @@ function checkInfoBlock(spec) {
 
   return violations;
 }
-
-///////////////////////////////////////////////////////////
+// 2. NAMING CONVENTIONS CHECKS
 
 function runNamingChecks(spec) {
   const violations = [];
@@ -170,7 +169,7 @@ function runNamingChecks(spec) {
   return violations;
 }
 
-// //////////////////////////////////////////////
+// 3. RESPONSE DEFINITIONS CHECKS
 
 function checkResponsesDefined(spec) {
   const violations = [];
@@ -291,7 +290,7 @@ function checkResponsesDefined(spec) {
   return violations;
 }
 
-// ///////////////////////////////////////////////
+// 4. SECURITY SCHEMES CHECKS
 
 function checkSecuritySchemes(spec) {
   const violations = [];
@@ -452,7 +451,7 @@ function checkSecuritySchemes(spec) {
   return violations;
 }
 
-// //////////////////////////////////////////////////
+// SCORING MECHANISM
 
 function calculateWeightedScore(violations, totalApis = 1) {
   // Normalize violations per API (scale invariant)

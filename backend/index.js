@@ -53,23 +53,6 @@ const options = {
 // Initialize Swagger specification from JSDoc options
 const swaggerSpec = swaggerJSDoc(options);
 
-// Load external Swagger spec JSON file for governance evaluation
-// const swaggerSpecPath = path.join(
-//   __dirname,
-//   "Adobe Experience Manager (AEM) API-swagger.json"
-// );
-// const loadedSpec = JSON.parse(fs.readFileSync(swaggerSpecPath, "utf8"));
-
-// // Run governance rules on loaded Swagger spec
-// const initialGovernanceResult = runAllRules(loadedSpec);
-// console.log("Governance Score:", initialGovernanceResult.score);
-
-// if (initialGovernanceResult.violations.length > 0) {
-//   console.error("Governance Violations:", initialGovernanceResult.violations);
-// } else {
-//   console.log("No governance violations found.");
-// }
-
 const specsDir = path.join(__dirname, "public");
 
 // List only specified files you want to check
@@ -78,24 +61,6 @@ const specificFiles = [
   "Amazon API Gateway-swagger.json",
   "Amazon AppStream-swagger.json",
 ];
-
-// specificFiles.forEach((file) => {
-//   const filePath = path.join(specsDir, file);
-//   if (!fs.existsSync(filePath)) {
-//     console.warn(`File not found: ${file}`);
-//     return;
-//   }
-//   const spec = JSON.parse(fs.readFileSync(filePath, "utf8"));
-
-//   const result = runAllRules(spec);
-//   console.log(`Governance Score for ${file}:`, result.score);
-
-//   if (result.violations.length > 0) {
-//     console.error(`Violations for ${file}:`, result.violations);
-//   } else {
-//     console.log(`No violations found for ${file}.`);
-//   }
-// });
 
 app.get("/governance/check/files", (req, res) => {
   const specificFiles = [

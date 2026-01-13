@@ -1,119 +1,101 @@
-const { runAllRules } = require("./governanceEngine");
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
 const { performance } = require("perf_hooks");
+// --- CRITICAL: CHECK THIS PATH ---
+// Make sure this points to the file where your logic lives (e.g., governance.js)
+// If you are unsure, try: require('./governanceService') or require('./linter')
+const { runAllRules } = require("./governanceEngine");
+// Rename it to 'runGovernance' so the rest of your script works:
+const runGovernance = runAllRules;
+// Path to your public folder
+const specsDir = path.join(__dirname, "../public");
 
-// SYNTHETIC DATA GENERATOR
-function generateSyntheticSpec(pathCount) {
-  const paths = {};
-
-  for (let i = 0; i < pathCount; i++) {
-    const pathName = `/api/resources/item-${i}`;
-
-    paths[pathName] = {
-      get: {
-        operationId: `getItem_${i}`,
-        responses: {
-          200: { description: "Success", content: { "application/json": {} } },
-          404: { description: "Not Found" },
-        },
-      },
-      post: {
-        operationId: `createItem_${i}`,
-        security: [{ bearerAuth: [] }],
-        responses: {
-          201: { description: "Created" },
-        },
-      },
-    };
-  }
-
-  return {
-    openapi: "3.0.0",
-    info: {
-      title: `Synthetic Benchmark API (Size: ${pathCount})`,
-      version: "1.0.0",
-      description:
-        "A synthetic API generated for performance characterization tests.",
-    },
-    paths: paths,
-    components: {
-      securitySchemes: {
-        bearerAuth: { type: "http", scheme: "bearer" },
-      },
-    },
-  };
+// --- 1. DEBUG IMPORT ---
+// This will tell us if the import is working correctly
+console.log("\n=== DEBUGGING IMPORT ===");
+console.log(`Type of runGovernance: ${typeof runGovernance}`);
+if (typeof runGovernance !== "function") {
+  console.error(
+    `❌ FATAL ERROR: runGovernance is imported as a "${typeof runGovernance}", not a function.`
+  );
+  console.error(
+    "If it prints an object below, you need to destructure your import (e.g., const { functionName } = require(...))"
+  );
+  console.log(runGovernance);
+  process.exit(1); // Stop script immediately
+} else {
+  console.log("✅ Import looks good (it is a function).");
 }
 
-// 2. STATISTICAL HELPERS
-function calculateStats(samples) {
-  const n = samples.length;
-  const mean = samples.reduce((a, b) => a + b, 0) / n;
-
-  // Standard Deviation
-  const variance =
-    samples.reduce((arr, val) => arr + Math.pow(val - mean, 2), 0) / (n - 1);
-  const stdDev = Math.sqrt(variance);
-
-  const marginOfError = 1.96 * (stdDev / Math.sqrt(n));
-
-  return { mean, marginOfError };
+// --- HELPER: System Info ---
+function getSystemInfo() {
+  const cpus = os.cpus();
+  const cpuModel = cpus.length > 0 ? cpus[0].model : "Unknown CPU";
+  const totalMem = (os.totalmem() / 1024 ** 3).toFixed(2);
+  return { cpuModel, cores: cpus.length, totalMem };
 }
 
-// 3. EXPERIMENT RUNNER
-async function runExperiment() {
-  const sizes = [1, 10, 50, 100, 500, 1000];
-  const iterations = 50;
+(async () => {
+  // Print System Config
+  const sys = getSystemInfo();
+  console.log(`\n=== SYSTEM CONFIGURATION ===`);
+  console.log(`CPU Model  : ${sys.cpuModel}`);
+  console.log(`Cores      : ${sys.cores}`);
+  console.log(`Total RAM  : ${sys.totalMem} GB`);
+  console.log(`OS         : ${os.platform()} ${os.release()}`);
+  console.log(
+    `-----------------------------------------------------------------------`
+  );
+  console.log(`File Name,Endpoints,Violations,Time(ms),Memory(MB)`);
+  console.log(
+    `-----------------------------------------------------------------------`
+  );
 
-  console.log("Size,Time(ms),Time_CI,Memory(MB),Memory_CI,CPU_Est(ms)");
-  console.log("-------------------------------------------------------");
+  try {
+    const files = fs.readdirSync(specsDir).filter((f) => f.endsWith(".json"));
 
-  for (const size of sizes) {
-    const timeSamples = [];
-    const memorySamples = [];
-    const cpuSamples = [];
+    for (const file of files) {
+      const filePath = path.join(specsDir, file);
 
-    // Warm-up run (V8 optimization)
-    runAllRules(generateSyntheticSpec(size));
+      try {
+        const fileContent = fs.readFileSync(filePath, "utf8");
+        const json = JSON.parse(fileContent);
 
-    for (let i = 0; i < iterations; i++) {
-      const spec = generateSyntheticSpec(size);
+        if (global.gc) global.gc();
 
-      if (global.gc) global.gc();
+        const startMem = process.memoryUsage().heapUsed;
+        const start = performance.now();
 
-      const startMem = process.memoryUsage().heapUsed;
-      const startCpu = process.cpuUsage();
-      const startTime = performance.now();
+        // --- EXECUTE GOVERNANCE CHECK ---
+        const result = await runGovernance(json);
 
-      runAllRules(spec);
+        const end = performance.now();
+        const endMem = process.memoryUsage().heapUsed;
 
-      const endTime = performance.now();
-      const endCpu = process.cpuUsage(startCpu);
-      const endMem = process.memoryUsage().heapUsed;
+        const timeTaken = (end - start).toFixed(3);
+        const memoryDiff = ((endMem - startMem) / 1024 / 1024).toFixed(4);
 
-      // Metrics
-      timeSamples.push(endTime - startTime);
+        const endpointCount = json.paths ? Object.keys(json.paths).length : 0;
 
-      // CPU Usage (User + System converted to ms)
-      const cpuTimeMs = (endCpu.user + endCpu.system) / 1000;
-      cpuSamples.push(cpuTimeMs);
+        let violationCount = 0;
+        if (Array.isArray(result)) {
+          violationCount = result.length;
+        } else if (result && result.violations) {
+          violationCount = result.violations.length;
+        } else if (result && result.errors) {
+          violationCount = result.errors.length;
+        }
 
-      // Memory diff
-      const memDiff = (endMem - startMem) / 1024 / 1024; // MB
-      memorySamples.push(Math.max(0, memDiff));
+        console.log(
+          `${file},${endpointCount},${violationCount},${timeTaken},${memoryDiff}`
+        );
+      } catch (err) {
+        // --- CRITICAL: PRINT THE ACTUAL ERROR ---
+        console.error(`${file},ERROR,0,0,0 -> ${err.message}`);
+      }
     }
-
-    const timeStats = calculateStats(timeSamples);
-    const memStats = calculateStats(memorySamples);
-    const cpuStats = calculateStats(cpuSamples);
-
-    console.log(
-      `${size},` +
-        `${timeStats.mean.toFixed(3)},` +
-        `${timeStats.marginOfError.toFixed(3)},` +
-        `${memStats.mean.toFixed(3)},` +
-        `${memStats.marginOfError.toFixed(3)},` +
-        `${cpuStats.mean.toFixed(3)}`
-    );
+  } catch (err) {
+    console.error("Critical Error:", err.message);
   }
-}
-
-runExperiment();
+})();

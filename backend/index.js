@@ -55,6 +55,23 @@ const swaggerSpec = swaggerJSDoc(options);
 
 const specsDir = path.join(__dirname, "public");
 
+// Define the output path inside the 'public' folder
+const outputFileName = "INTERNAL_API.json";
+const outputPath = path.join(__dirname, "public", outputFileName);
+
+try {
+  // 1. Ensure 'public' folder exists (just in case)
+  if (!fs.existsSync(path.join(__dirname, "public"))) {
+    fs.mkdirSync(path.join(__dirname, "public"));
+  }
+
+  // 2. Write the JSON file to disk
+  fs.writeFileSync(outputPath, JSON.stringify(swaggerSpec, null, 2), "utf-8");
+  console.log(`✅ Local API Spec saved to: ${outputPath}`);
+} catch (err) {
+  console.error(`❌ Failed to save Local API Spec: ${err.message}`);
+}
+
 // List only specified files you want to check
 const specificFiles = [
   "Alexa For Business-swagger.json",

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"No tests yet\" && exit 0",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon --ignore 'public/*' index.js"
   },
   "keywords": [],
   "author": "",

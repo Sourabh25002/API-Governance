@@ -1,105 +1,128 @@
 # API Governance Engine (Policy-as-Code for OpenAPI)
 
-A lightweight policy-as-code engine that analyzes OpenAPI specifications, detects governance violations (security, responses, naming, versioning), computes a compliance score, and integrates with CI/CD and a dashboard for visibility.
+A lightweight policy-as-code engine that analyzes OpenAPI specifications, detects governance violations across security, responses, naming, and versioning categories, computes a weighted compliance score, and integrates with CI/CD and a dashboard for visibility.
 
 ## Features
 
-- Rule-based validation across 4 governance areas:
-- Info & versioning (metadata completeness, SemVer checks).
-- Naming conventions (RESTful path conventions, `operationId` presence/style).
-- Response definitions (2xx/4xx/5xx coverage, response structure completeness).
-- Security scheme validations (HTTPS, security schemes, unsafe method protection, 429 recommendation).
-- Portfolio-level compliance scoring in the range [0, 100] using category weights, severity multipliers, and normalization.
-- CI/CD workflow that runs governance checks on push/PR and can block merges/deployments below a threshold.
-- Dashboard UI that shows compliance score and violations grouped by category.
+- **Rule-based validation** across 4 governance categories:
+  - **Info & Versioning** — metadata completeness, SemVer format checks.
+  - **Naming Conventions** — RESTful path conventions (lowercase, hyphens, nouns, plurals), `operationId` presence and style.
+  - **Response Definitions** — 2xx/4xx/5xx coverage, response descriptions, content type validation.
+  - **Security Schemes** — HTTPS enforcement, bearer token usage, unsafe method protection, rate limiting (429), unused scheme detection.
+- **Weighted compliance scoring** in [0, 100] using category weights, severity multipliers, and normalization.
+- **CI/CD pipeline** that runs governance checks on push/PR and blocks merges below 80% threshold.
+- **Dashboard UI** that displays compliance score and violations grouped by severity.
+- **Performance benchmarking** tool to measure execution time and memory usage per spec.
 
 ## Repository Structure
 
-- `backend/` — Node.js/Express backend that loads OpenAPI specs and runs governance checks.
-- `frontend/` — Next.js/React dashboard that fetches reports and visualizes results.
-- `backend/public/` — Public OpenAPI JSON files (sampled from APIs.guru) for evaluation.
-- `backend/routes/` — Synthetic API routes used to generate OpenAPI specs via JSDoc annotations.
-- `.github/workflows/` — CI/CD workflow for automated governance checks.
+```
+├── backend/
+│   ├── index.js                  # Express server entry point
+│   ├── routes/api.js             # Synthetic e-commerce API (Swagger JSDoc)
+│   ├── services/
+│   │   ├── governanceEngine.js   # Core rule engine + scoring
+│   │   └── benchmark.js          # Performance benchmarking CLI
+│   └── public/                   # OpenAPI JSON specs (AWS/Amazon + auto-generated)
+├── frontend/
+│   └── src/app/
+│       ├── page.js               # Next.js page entry
+│       ├── GovernanceDashboard.js # React dashboard component
+│       └── GovernanceDashboard.module.css
+└── .github/workflows/ci.yml     # GitHub Actions CI/CD workflow
+```
 
 ## Prerequisites
 
-- Node.js 20.x (recommended).
-- npm (comes with Node).
+- Node.js 20.x (recommended)
+- npm (comes with Node)
 
-## Quick Start (Local)
+## Quick Start
 
-1. Clone the repository:
+### 1. Clone the repository
 
-   ```
-   git clone https://github.com/Sourabh25002/API-Governance.git
-   cd API-GovernANCE
-   ```
+```bash
+git clone https://github.com/Sourabh25002/API-Governance.git
+cd API-Governance
+```
 
-2. Start the backend:
+### 2. Start the backend (port 8000)
 
-   ```
-   cd backend
-   npm ci
-   npm start
-   ```
+```bash
+cd backend
+npm ci
+npm start
+```
 
-3. (Optional) Start the dashboard:
+### 3. Start the frontend dashboard (port 3000)
 
-   ```
-   cd ../frontend
-   npm ci
-   npm run dev
-   ```
+```bash
+cd frontend
+npm ci
+npm run dev
+```
 
-4. Run a governance check (example):
-   - Open your browser or use curl to call the backend endpoint that triggers evaluation and returns a JSON report.
+Open [http://localhost:3000](http://localhost:3000) to access the dashboard.
 
-## API Endpoints (Backend)
+### 4. Run a governance check
 
-Typical endpoints exposed by the backend:
+```bash
+# Single-spec check (auto-generated spec)
+curl http://localhost:8000/governance/check
 
-- `GET /governance/check` — Evaluate the primary OpenAPI spec and return score + violations.
-- `GET /governance/checkfiles` — Evaluate a configured set of OpenAPI JSON files and return aggregated results.
+# Multi-file check (17 public AWS/Amazon specs)
+curl http://localhost:8000/governance/check/files
+```
 
-(Exact route names and response formats are described in the paper and codebase.)
+## API Endpoints
+
+| Endpoint                  | Method | Description                                                               |
+|---------------------------|--------|---------------------------------------------------------------------------|
+| `/governance/check`       | GET    | Validate the auto-generated OpenAPI spec and return `{score, violations}` |
+| `/governance/check/files` | GET    | Validate 17 preset public OpenAPI specs and return per-file results       |
+| `/api-docs`               | GET    | Swagger UI for browsing the synthetic e-commerce APIs                     |
+| `/api-docs.json`          | GET    | Raw OpenAPI JSON spec download                                            |
+
+## Running the Benchmark
+
+The benchmark script measures governance engine performance (execution time and memory usage) against all OpenAPI specs in the `public/` folder.
+
+```bash
+cd backend
+node services/benchmark.js
+```
+
+**Output format** (CSV):
+
+```
+File Name,Endpoints,Violations,Time(ms),Memory(MB)
+```
+
+The script also prints system configuration (CPU, cores, RAM, OS) for reproducibility.
+
+## How Scoring Works
+
+- Violations are grouped into categories: **Security (30%)**, **Responses (25%)**, **Naming (20%)**, **Versioning (15%)**, **Other (10%)**.
+- Severity multipliers: **Errors = 1.5×**, **Warnings = 1.0×**.
+- Each category penalty is capped at its weight to prevent single-category domination.
+- Final score: `100 − total_weighted_penalty`, clipped to [0, 100].
 
 ## CI/CD Integration (GitHub Actions)
 
-The project includes a GitHub Actions workflow that:
+The included workflow (`.github/workflows/ci.yml`) runs on every push and PR to `main`:
 
-- Runs on push and pull requests.
-- Starts the backend.
-- Calls governance endpoints to generate reports.
-- Fails the pipeline if the compliance score drops below the configured threshold.
-
-To enable CI gating in your fork:
-
-1. Keep the workflow file in `.github/workflows/`.
-2. Adjust the threshold and endpoints if needed.
-3. Commit and push—checks will run automatically on PRs.
-
-## How Scoring Works (High-level)
-
-- Violations are grouped into categories (security, responses, naming, versioning, other).
-- Errors have higher penalty than warnings (severity multiplier).
-- Penalties are normalized by portfolio size and capped by category weights.
-- Final score: `100 - total_penalty`, clipped to [0, 100].
-
-## Dataset (For Reproducing Paper Results)
-
-- Synthetic e-commerce APIs: generated from route/JSDoc specs.
-- Public OpenAPI specs: JSON files stored under `backend/public/`, sampled from APIs.guru.
+1. Installs dependencies and starts the backend.
+2. Runs single-file and multi-file governance checks.
+3. **Fails the pipeline** if compliance score drops below **80%**.
+4. Uploads `governance-report.json` as a build artifact (30-day retention).
+5. Comments on PRs with score, violation count, and merge readiness.
 
 ## Contributing
 
-- Add new rules as modular JavaScript functions.
-- Keep rule outputs consistent (category, severity, path/method context).
-- Add tests (recommended) and update documentation.
+- Add new rules as modular functions in `governanceEngine.js`.
+- Keep rule outputs consistent: `{path, method, message, severity}`.
+- Update tests and documentation accordingly.
 
 ## License
 
-Add your license here (MIT/Apache-2.0/etc.). If you haven’t chosen one yet, create a `LICENSE` file and reference it here.
-
-## Citation
-
-If you use this work in academic context, cite the accompanying paper/report from this repository.
+MIT

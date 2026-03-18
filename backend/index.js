@@ -11,12 +11,7 @@ const { runAllRules } = require("./services/governanceEngine");
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-// Enable CORS for frontend origin
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-  })
-);
+app.use(cors({ origin: "http://localhost:3000" }));
 
 // Swagger JSDoc configuration
 const options = {
